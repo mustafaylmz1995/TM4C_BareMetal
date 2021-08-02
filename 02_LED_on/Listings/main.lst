@@ -1,0 +1,177 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000         
+    2 00000000                 AREA             |.text|, CODE, READONLY, ALIGN=
+4
+    3 00000000                 THUMB
+    4 00000000                 EXPORT           __main
+    5 00000000         
+    6 00000000 400FE608 
+                       RCGCGPIO_PORTN
+                               EQU              0x400FE608
+    7 00000000 40064400 
+                       GPIODIR_PORTN
+                               EQU              0x40064400
+    8 00000000 4006451C 
+                       GPIODEN_PORTN
+                               EQU              0x4006451C
+    9 00000000 4006400C 
+                       GPIODATA_PORTN
+                               EQU              0x4006400C  ;shift 2 bit left 
+   10 00000000         
+   11 00000000         __main
+   12 00000000 F000 F803       BL               GPIO_Init
+   13 00000004         
+   14 00000004         Loop
+   15 00000004 F000 F811       BL               LED_On
+   16 00000008 E7FC            B                Loop
+   17 0000000A         
+   18 0000000A         
+   19 0000000A         
+   20 0000000A         GPIO_Init
+   21 0000000A 490B            ldr              R1, =RCGCGPIO_PORTN
+   22 0000000C 6808            ldr              R0, [R1]
+   23 0000000E F440 5080       orr              R0, R0, #0x1000 ;0001 0000 0000
+                                                             0000 12. bit N por
+                                                            tu
+   24 00000012 6008            str              R0, [R1]
+   25 00000014         
+   26 00000014 4909            ldr              R1, =GPIODIR_PORTN
+   27 00000016 6808            ldr              R0, [R1]
+   28 00000018 F040 0003       orr              R0, R0, #0x03 ; 0000 0011 0. ve
+                                                             1. bit
+   29 0000001C 6008            str              R0, [R1]
+   30 0000001E         
+   31 0000001E         ; ldr R1, =GPIOAFSEL_PORTN
+   32 0000001E         ; ldr R0, [R1]
+   33 0000001E         ; and R0, R0, #0xFC ;1111 1100 0. ve 1. bit 0 olacak
+   34 0000001E         ; str R0, [R1]
+   35 0000001E         
+   36 0000001E 4908            ldr              R1, =GPIODEN_PORTN
+   37 00000020 6808            ldr              R0, [R1]
+   38 00000022 F040 0003       orr              R0, R0, #0x03 ; 0000 0011 0. ve
+                                                             1. bit
+   39 00000026 6008            str              R0, [R1]
+   40 00000028         
+   41 00000028         
+   42 00000028 4770            BX               LR
+   43 0000002A         
+   44 0000002A         
+   45 0000002A         
+   46 0000002A         LED_On
+
+
+
+ARM Macro Assembler    Page 2 
+
+
+   47 0000002A 4906            ldr              R1, =GPIODATA_PORTN
+   48 0000002C 6808            ldr              R0, [R1]
+   49 0000002E F040 0003       orr              R0, R0, #0x03 ;0000 0000 0000 0
+                                                            011 0. ve 1. bit
+   50 00000032 6008            str              R0, [R1]
+   51 00000034 4770            BX               LR
+   52 00000036         
+   53 00000036 00 00           ALIGN
+   54 00000038                 END
+              400FE608 
+              40064400 
+              4006451C 
+              4006400C 
+Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4 --apcs=interw
+ork --depend=.\objects\main.d -o.\objects\main.o -I.\RTE\_TM4C1294 -IC:\Users\m
+ustafa\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include -IC:\Users\mu
+stafa\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C129 --pred
+efine="__EVAL SETA 1" --predefine="__UVISION_VERSION SETA 529" --predefine="_RT
+E_ SETA 1" --predefine="TM4C1294NCPDT SETA 1" --list=.\listings\main.lst main.s
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+.text 00000000
+
+Symbol: .text
+   Definitions
+      At line 2 in file main.s
+   Uses
+      None
+Comment: .text unused
+GPIO_Init 0000000A
+
+Symbol: GPIO_Init
+   Definitions
+      At line 20 in file main.s
+   Uses
+      At line 12 in file main.s
+Comment: GPIO_Init used once
+LED_On 0000002A
+
+Symbol: LED_On
+   Definitions
+      At line 46 in file main.s
+   Uses
+      At line 15 in file main.s
+Comment: LED_On used once
+Loop 00000004
+
+Symbol: Loop
+   Definitions
+      At line 14 in file main.s
+   Uses
+      At line 16 in file main.s
+Comment: Loop used once
+__main 00000000
+
+Symbol: __main
+   Definitions
+      At line 11 in file main.s
+   Uses
+      At line 4 in file main.s
+Comment: __main used once
+5 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Absolute symbols
+
+GPIODATA_PORTN 4006400C
+
+Symbol: GPIODATA_PORTN
+   Definitions
+      At line 9 in file main.s
+   Uses
+      At line 47 in file main.s
+Comment: GPIODATA_PORTN used once
+GPIODEN_PORTN 4006451C
+
+Symbol: GPIODEN_PORTN
+   Definitions
+      At line 8 in file main.s
+   Uses
+      At line 36 in file main.s
+Comment: GPIODEN_PORTN used once
+GPIODIR_PORTN 40064400
+
+Symbol: GPIODIR_PORTN
+   Definitions
+      At line 7 in file main.s
+   Uses
+      At line 26 in file main.s
+Comment: GPIODIR_PORTN used once
+RCGCGPIO_PORTN 400FE608
+
+Symbol: RCGCGPIO_PORTN
+   Definitions
+      At line 6 in file main.s
+   Uses
+      At line 21 in file main.s
+Comment: RCGCGPIO_PORTN used once
+4 symbols
+345 symbols in table
