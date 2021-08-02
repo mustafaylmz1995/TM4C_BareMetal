@@ -1,0 +1,96 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000         
+    2 00000000                 AREA             DATA, ALIGN=2
+    3 00000000                 IMPORT           num
+    4 00000000                 IMPORT           Adder
+    5 00000000         
+    6 00000000         
+    7 00000000                 AREA             |.text|, CODE, READONLY, ALIGN=
+2
+    8 00000000                 THUMB
+    9 00000000                 EXPORT           __main
+   10 00000000         
+   11 00000000         __main
+   12 00000000 4902            ldr              R1, =num
+   13 00000002 F04F 0064       mov              R0, #100
+   14 00000006 6008            STR              R0, [R1]
+   15 00000008 F7FF FFFE       BL               Adder
+   16 0000000C         
+   17 0000000C         
+   18 0000000C                 ALIGN
+   19 0000000C                 END
+              00000000 
+Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4.fp.sp --apcs=
+interwork --depend=.\objects\main.d -o.\objects\main.o -I.\RTE\_TM4C1294 -IC:\U
+sers\mustafa\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include -IC:\Us
+ers\mustafa\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C129 
+--predefine="__EVAL SETA 1" --predefine="__UVISION_VERSION SETA 529" --predefin
+e="_RTE_ SETA 1" --predefine="TM4C1294NCPDT SETA 1" --list=.\listings\main.lst 
+main.s
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+DATA 00000000
+
+Symbol: DATA
+   Definitions
+      At line 2 in file main.s
+   Uses
+      None
+Comment: DATA unused
+1 symbol
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+.text 00000000
+
+Symbol: .text
+   Definitions
+      At line 7 in file main.s
+   Uses
+      None
+Comment: .text unused
+__main 00000000
+
+Symbol: __main
+   Definitions
+      At line 11 in file main.s
+   Uses
+      At line 9 in file main.s
+Comment: __main used once
+2 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+External symbols
+
+Adder 00000000
+
+Symbol: Adder
+   Definitions
+      At line 4 in file main.s
+   Uses
+      At line 15 in file main.s
+Comment: Adder used once
+num 00000000
+
+Symbol: num
+   Definitions
+      At line 3 in file main.s
+   Uses
+      At line 12 in file main.s
+Comment: num used once
+2 symbols
+342 symbols in table

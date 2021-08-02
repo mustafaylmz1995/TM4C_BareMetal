@@ -1,0 +1,86 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000         
+    2 00000000         ;----------------------------------------------------
+    3 00000000                 AREA             DATA, ALIGN=2
+    4 00000000 00 00 00 
+              00       amount  SPACE            4           ;each space is byte
+                                                             ; 4byte 32bit
+    5 00000004                 EXPORT           amount
+    6 00000004         
+    7 00000004         ;----------------------------------------------------
+    8 00000004         
+    9 00000004         ;----------------------------------------------------
+   10 00000004                 AREA             |.text|, CODE, READONLY, ALIGN=
+2
+   11 00000000                 THUMB
+   12 00000000                 EXPORT           Amount_Func
+   13 00000000         
+   14 00000000         Amount_Func
+   15 00000000 4902            ldr              R1, =amount
+   16 00000002 F04F 0059       mov              R0, #89
+   17 00000006 6008            str              R0, [R1]
+   18 00000008 4770            bx               LR
+   19 0000000A         
+   20 0000000A 00 00           ALIGN
+   21 0000000C                 END
+              00000000 
+Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4.fp.sp --apcs=
+interwork --depend=.\objects\function.d -o.\objects\function.o -I.\RTE\_TM4C129
+4 -IC:\Users\mustafa\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include
+ -IC:\Users\mustafa\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\
+TM4C129 --predefine="__EVAL SETA 1" --predefine="__UVISION_VERSION SETA 529" --
+predefine="_RTE_ SETA 1" --predefine="TM4C1294NCPDT SETA 1" --list=.\listings\f
+unction.lst function.s
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+DATA 00000000
+
+Symbol: DATA
+   Definitions
+      At line 3 in file function.s
+   Uses
+      None
+Comment: DATA unused
+amount 00000000
+
+Symbol: amount
+   Definitions
+      At line 4 in file function.s
+   Uses
+      At line 5 in file function.s
+      At line 15 in file function.s
+
+2 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+.text 00000000
+
+Symbol: .text
+   Definitions
+      At line 10 in file function.s
+   Uses
+      None
+Comment: .text unused
+Amount_Func 00000000
+
+Symbol: Amount_Func
+   Definitions
+      At line 14 in file function.s
+   Uses
+      At line 12 in file function.s
+Comment: Amount_Func used once
+2 symbols
+341 symbols in table
