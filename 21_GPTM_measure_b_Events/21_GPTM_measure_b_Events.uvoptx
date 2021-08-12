@@ -134,10 +134,6 @@
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
-          <Key>DLGUARM</Key>
-        </SetRegEntry>
-        <SetRegEntry>
-          <Number>0</Number>
           <Key>lmidk-agdi</Key>
           <Name>-U0F009B63 -O4623 -S3 -FO61</Name>
         </SetRegEntry>

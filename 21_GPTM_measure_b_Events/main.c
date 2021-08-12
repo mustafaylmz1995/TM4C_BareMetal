@@ -134,13 +134,15 @@ void delay_Microsecond(unsigned int time){
 
 void Ports_Init(void){
 	SYSCTL->RCGCGPIO |= (1U<<14); //PQ for Trigger clk enabled
-	SYSCTL->RCGCGPIO |= (1U<<5);	//PF for LED4
 	//we dont need to initialize Port b because we have done before
 	GPIOQ->DIR |= TRIG; //output for Trigger pin
-	GPIOF_AHB->DIR |= LED4; // ouput for PF0 LED4
 	GPIOQ->DEN |= TRIG;
+	
+	SYSCTL->RCGCGPIO |= (1U<<5);	//PF for LED4
+	GPIOF_AHB->DIR |= LED4; // ouput for PF0 LED4
 	GPIOF_AHB->DEN |=LED4;
 	
+
 }
 
 
@@ -155,11 +157,21 @@ unsigned int measureDistance(void){
 	
 	//Capture first Edge i.e. rising Edge
 	TIMER4->ICR = (1U<<2); //Timer A Capture Mode Event Interrupt Clear CAECINT (2.bit)	
-	while((TIMER4->RIS & 4)==0){}; //Wait till captured
+	unsigned int temp = (TIMER4->RIS & 4);
+	while(temp ==0){
+		temp = (TIMER4->RIS & 4);
+	} //Wait till captured
+	
+	
 	highEdge = TIMER4->TAR; //highEdge = the time at which last edge event took place
 		
 	TIMER4->ICR = (1U<<2); //Clear Timer Capture Flag
-	while((TIMER4->RIS & 4)==0){}; //Wait till captured
+	temp = (TIMER4->RIS & 4);
+	while(temp ==0){
+		temp = (TIMER4->RIS & 4);
+	} //Wait till captured
+	
+		
 	lowEdge = TIMER4->TAR;
 		
 	ddistance = lowEdge - highEdge;
