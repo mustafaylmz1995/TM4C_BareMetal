@@ -122,9 +122,13 @@ void delay_Microsecond(unsigned int time){
 	TIMER0->ICR = 0x01;// TBTOCINT 8. bit and TATOCINT 0. bit for clearing interupt controller register
 		
 	TIMER0->CTL  |= (1U<<0); // TAEN 0. bit and TBEN 8. bit	
-		
+	
+	unsigned int temp = (TIMER0->RIS & 0x1);
+	
 	for(j =0; j<time; j++){		
-		while( (TIMER0->RIS & 0x1) == 0x0 ); // wait for timeout flag to set
+		while( temp == 0x0 ){
+			temp = 	(TIMER0->RIS & 0x1);
+		}// wait for timeout flag to set
 		TIMER0->ICR = 0x01;
 	}	
 	
