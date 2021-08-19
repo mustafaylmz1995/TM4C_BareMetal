@@ -4,6 +4,11 @@
 #define LED4	(1U<<0)	//PF0
 
 
+
+void delayMs(int delay);
+
+
+
 int main(void){
 	
 	//Switch at PJ0 port PJ1
@@ -53,6 +58,17 @@ int main(void){
 	NVIC->IP[30] = (3U<<5);	// set interrupt to priority 3
 	NVIC->ISER[0] = 0x40000000;	//Enable IRQ30
 	
+	__enable_irq();
+	
+	while(1){
+		
+		//Toggle LED4
+		GPIOF_AHB->DATA |= ~LED4;
+		delayMs(100);
+		GPIOF_AHB->DATA &= ~LED4;
+		delayMs(100);
+		
+	}
 	
 	
 		
@@ -60,3 +76,44 @@ int main(void){
 	return 0;
 	
 }
+
+
+void GPIOF_Handler(void){ //can fetch prototype 
+	
+	volatile int readback;
+	
+	
+	//toogle green LED4 3 times 
+	int i = 0;
+	for(i = 0; i<3; i++){
+		GPIOF_AHB->DATA |= LED4;
+		delayMs(100);
+		GPIOF_AHB->DATA &= ~LED4;
+		delayMs(100);
+		
+	}
+	
+	GPIOJ_AHB->ICR |= (0x03); //clear any prior interrupt
+	
+	readback = GPIOJ_AHB->ICR;
+	
+	
+}
+
+
+void delayMs(int delay){
+	int i=0;
+	for(i=0; i<delay; i++){
+		int j=0;
+		for(j=0; j<3180; j++){
+			
+		}
+		
+	}
+	
+}
+
+
+
+
+
