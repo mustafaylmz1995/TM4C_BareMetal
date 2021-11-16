@@ -18,7 +18,7 @@
 // Pinout for MCU TM4C1294
 // TRIG -> Digital Output Pin (PQ0)
 // ECHO -> Digital Input Pin 
-// (Put a 200K resistor) [ PB0 / T2CCP0 ]
+// [ PB0 / T4CCP0 ]
 
 #define micro	1U
 #define mili 	1000U
@@ -27,7 +27,7 @@
 
 #define ECHO	(1U<<0)		//PB0
 #define TRIG	(1U<<0)		//PQ0
-#define LED4	(1U<<00)	//PF0
+#define LED4	(1U<<0)		//PF0
 
 const double _25MHz_1clk = 40e-9; //Value of 1 clk cycle in nanosecond
 const unsigned int MULTIPLIER = 5882; 
@@ -47,7 +47,7 @@ int main(){
 	
 	while(1){
 		distance_in_cm = measureDistance();
-			if(measureDistance() < 15){
+			if(distance_in_cm < 15){
 				GPIOF_AHB->DATA |= LED4;
 			}else{
 				GPIOF_AHB->DATA &= ~LED4;
@@ -56,25 +56,14 @@ int main(){
 	}
 	
 	
-	
+
 	return 0;
 }
 
 
 void Timer4_init(void){
 	
-	SYSCTL->RCGCTIMER |= (1U<<4); //enable clk to Timer Block 4 0b 0001 0000
-	SYSCTL->RCGCGPIO |= (1U<<1);	//Enable clk to PORTB
-	
-	GPIOB_AHB->DIR &= ~ECHO;	//make PB0 an input pin
-	GPIOB_AHB->DEN |= ECHO;		//make PB0 a digital pin
-	GPIOB_AHB->AFSEL |= ECHO;	//enable alternate function on PB0
-	
-	GPIOB_AHB->PCTL &= ~(0x0000000F); //configure PB0 as T4CCP0 pin
-	GPIOB_AHB->PCTL &= ~(0x00000003);	//Third Functionality is Timerblock
-	
-	
-		//Input Edge Time Mode
+	//Input Edge Time Mode
 	
 	// TAEN 0. bit and TBEN 8. bit
 	TIMER4->CTL  &= ~(1U<<0); //disable TIMER4A
@@ -85,7 +74,7 @@ void Timer4_init(void){
 	//Write TACDIR to 0x1 for timer starts from value of 0x00 (4th bit)
 	//Write TACMR to 0x1 for Edge Time mode (2nd bit)
 	//Write a value of 0x03 for Capture mode (0th and 1st bits)
-	TIMER4->TAMR = 0x17; //up-count, edge-time, capture mode
+	TIMER4->TAMR = 0x23; //up-count, edge-time, capture mode
 	
 //	TIMER4->TAMATCHR = 0xFFFF;	//set the count limit, compared to TAR to determine match evetn
 //	TIMER4->TAPMR = 0xFF; // used with TAMATCHR to expand to 0xFFFF FF with prescaler
@@ -97,9 +86,10 @@ void Timer4_init(void){
 	// 0x2 Reserved
 	// 0x3 Both Edges
 	
-	TIMER4->CTL |= (3U<<2); //Both Edges
+	TIMER4->CTL |= 0x12; //Both Edges
+	TIMER4->IMR |= (0x4); // Capture interrupt enabled (CAEIM)
 
-	TIMER0->CTL  |= (1U<<0); // TAEN 0. bit and TBEN 8. bit	 
+	TIMER4->CTL  |= (1U<<0); // TAEN 0. bit and TBEN 8. bit	 
 	
 	
 }
@@ -138,13 +128,27 @@ void delay_Microsecond(unsigned int time){
 
 void Ports_Init(void){
 	SYSCTL->RCGCGPIO |= (1U<<14); //PQ for Trigger clk enabled
-	//we dont need to initialize Port b because we have done before
+	
 	GPIOQ->DIR |= TRIG; //output for Trigger pin
 	GPIOQ->DEN |= TRIG;
 	
+//-----------------	
+	SYSCTL->RCGCGPIO |= (1U<<1);	//Enable clk to PORTB	
+	SYSCTL->RCGCTIMER |= (1U<<4); //enable clk to Timer Block 4 0b 0001 0000
+	
+	GPIOB_AHB->DIR &= ~ECHO;	//make PB0 an input pin
+	GPIOB_AHB->DEN |= ECHO;		//make PB0 a digital pin
+	
+	GPIOB_AHB->AFSEL |= ECHO;	//enable alternate function on PB0
+	GPIOB_AHB->PCTL &= ~(0x0000000F); //configure PB0 as T4CCP0 pin
+	GPIOB_AHB->PCTL &= ~(0x00000003);	//Third Functifridgefridgeonality is Timerblock
+//-----------------
+	
 	SYSCTL->RCGCGPIO |= (1U<<5);	//PF for LED4
+	
 	GPIOF_AHB->DIR |= LED4; // ouput for PF0 LED4
-	GPIOF_AHB->DEN |=LED4;
+	GPIOF_AHB->DEN |= LED4;
+	
 	
 
 }
