@@ -15,13 +15,16 @@ int main(void){
 	SYSCTL->RCGCGPIO |= (1U<<8);
 	
 //	//Unlock PJ0
-//	GPIOJ_AHB->LOCK |= 0x4C4F434B;
-//	GPIOJ_AHB->CR		=	0x01;
-//	GPIOJ_AHB->LOCK	= 0;
+	if( (GPIOJ_AHB->LOCK) == 1){ //locked
+		GPIOJ_AHB->LOCK |= 0x4C4F434B; //for unlock	
+	}
 
+	__IO uint32_t *tmp;
+	tmp = (__IO uint32_t *) GPIOJ_AHB->CR;
+	*tmp = 0x01;
+	GPIOJ_AHB->PUR |= (0x03); //enable pullup for SW1 and SW2 (PJ0, PJ1)
 	GPIOJ_AHB->DIR &= ~(0x03); //input
 	GPIOJ_AHB->DEN |= (0x03);
-	GPIOJ_AHB->PUR |= (0x03); //enable pullup for SW1 and SW2 (PJ0, PJ1)
 	
 	SYSCTL->RCGCGPIO |= (1U<<8);
 	GPIOF_AHB->DIR |= LED4; //output
