@@ -2,11 +2,17 @@
 
 
 #define LED4	(1U<<0)	//PF0
+#define LED3	(1U<<4)	//PF4
+
+#define micro 1U
+#define mili 1000U
+#define sec	1000000U
 
 
 
-void delayMs(int delay);
+void delay(unsigned int time);
 
+unsigned int state = 0;
 
 
 int main(void){
@@ -14,24 +20,24 @@ int main(void){
 	//Switch at PJ0 port PJ1
 	SYSCTL->RCGCGPIO |= (1U<<8);
 	
-//	//Unlock PJ0
-	if( (GPIOJ_AHB->LOCK) == 1){ //locked
-		GPIOJ_AHB->LOCK |= 0x4C4F434B; //for unlock	
-	}
+////	//Unlock PJ0
+//	if( (GPIOJ_AHB->LOCK) == 1){ //locked
+//		GPIOJ_AHB->LOCK |= 0x4C4F434B; //for unlock	
+//	}
 
-	__IO uint32_t *tmp;
-	tmp = (__IO uint32_t *) GPIOJ_AHB->CR;
-	*tmp = 0x01;
-	GPIOJ_AHB->PUR |= (0x03); //enable pullup for SW1 and SW2 (PJ0, PJ1)
-	GPIOJ_AHB->DIR &= ~(0x03); //input
-	GPIOJ_AHB->DEN |= (0x03);
+//	__IO uint32_t *tmp;
+//	tmp = (__IO uint32_t *) GPIOJ_AHB->CR;
+//	*tmp = 0x01;
+	GPIOJ_AHB->PUR |= (0x01); //enable pullup for SW1 and SW2 (PJ0, PJ1)
+	GPIOJ_AHB->DIR &= ~(0x01); //input
+	GPIOJ_AHB->DEN |= (0x01);
 	
-	SYSCTL->RCGCGPIO |= (1U<<8);
-	GPIOF_AHB->DIR |= LED4; //output
-	GPIOF_AHB->DEN |= LED4;
+	SYSCTL->RCGCGPIO |= (1U<<5);
+	GPIOF_AHB->DIR |= (LED4 | LED3); //output
+	GPIOF_AHB->DEN |= (LED4 | LED3);
 	
 
-	__disable_irq();
+	__disable_irq(); //CPSR daki int bayragini kapatiyor.
 	
 // All bits are cleared by a reset
 	
@@ -49,27 +55,25 @@ int main(void){
 // 	For a GPIO edge-detect interrupt, the RIS bit in the 
 // GPIORIS register is cleared by writing a ‘1’ to the 
 // corresponding bit in the GPIO Interrupt Clear (GPIOICR) register
-//	GPIOA_AHB->IM |= (0x03); 
 
-	GPIOJ_AHB->IS &= ~(0x03);	//make SW1 and SW2 edge sensitive
-	GPIOJ_AHB->IBE &= ~(0x03);
-	GPIOJ_AHB->IEV &= ~(0x03); //clearing is falling edge detection/low level
-	GPIOJ_AHB->ICR |= (0x03); //clear any prior interrupt
-	GPIOJ_AHB->IM |=  (0x03);	//unmask interrupt
+	GPIOJ_AHB->IM &= ~(0x01); //Mask the corresponding port by clearing the IME field in the GPIOIM register. Interrupt'i kapattik
+	GPIOJ_AHB->IS &= ~(0x01);	//make SW1 edge sensitive(0 edge, 1 level sens)
+	GPIOJ_AHB->IBE &= ~(0x01); //Interrupt Both Edges (0 IEV karar versin demek)
+	GPIOJ_AHB->IEV &= ~(0x01); //clearing is falling edge detection/low level (0 falling edge, 1 rising edge)
+	GPIOJ_AHB->ICR |= (0x01); //clear any prior interrupt
+	GPIOJ_AHB->IM |=  (0x01);	//unmask interrupt IRQ açtik
 	
 	
-	NVIC->IP[30] = (3U<<5);	// set interrupt to priority 3
-	NVIC->ISER[0] = 0x40000000;	//Enable IRQ30
+	NVIC->IP[51] = (0x03);	// set interrupt to priority 3
+	NVIC->ISER[1] = (1U<<19);	//Enable IRQ51 32+19
 	
 	__enable_irq();
 	
 	while(1){
 		
-		//Toggle LED4
-		GPIOF_AHB->DATA |= ~LED4;
-		delayMs(100);
-		GPIOF_AHB->DATA &= ~LED4;
-		delayMs(100);
+		//Toggle LED3
+		GPIOF_AHB->DATA ^= LED3;
+		delay(1000*mili);
 		
 	}
 	
@@ -81,7 +85,7 @@ int main(void){
 }
 
 
-void GPIOF_Handler(void){ //can fetch prototype 
+void GPIOJ_Handler(void){ //can fetch prototype 
 	
 	volatile int readback;
 	
@@ -90,9 +94,9 @@ void GPIOF_Handler(void){ //can fetch prototype
 	int i = 0;
 	for(i = 0; i<3; i++){
 		GPIOF_AHB->DATA |= LED4;
-		delayMs(100);
+		delay(250*mili);
 		GPIOF_AHB->DATA &= ~LED4;
-		delayMs(100);
+		delay(250*mili);
 		
 	}
 	
@@ -103,19 +107,35 @@ void GPIOF_Handler(void){ //can fetch prototype
 	
 }
 
+void delay(unsigned int time){
+	
+	time = (unsigned int)time*1.33929;
+	
+	unsigned int j=0;
+	SYSCTL->RCGCTIMER |= 0x01;
+	for(int i = 0; i<1; i++){}
+	
+	TIMER0->CTL &= ~(1U<<0);
+	TIMER0->CFG = 0x04;
 
-void delayMs(int delay){
-	int i=0;
-	for(i=0; i<delay; i++){
-		int j=0;
-		for(j=0; j<3180; j++){
-			
-		}
+	TIMER0->TAMR = 0x02;
+	TIMER0->TAILR = 25-1;
+
+	TIMER0->ICR =0x01;
+	TIMER0->CTL |= (1U<<0);
 		
+	unsigned int temp = (TIMER0->RIS &0x1);
+		
+	for (j=0; j<time; j++){
+		while(temp==0x00){
+			temp = (TIMER0->RIS &0x1);
+		}
+		TIMER0->ICR = 0x01;
 	}
 	
-}
 
+}
+	
 
 
 

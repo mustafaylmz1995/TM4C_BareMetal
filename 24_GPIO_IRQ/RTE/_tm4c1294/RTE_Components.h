@@ -3,7 +3,7 @@
  * Auto generated Run-Time-Environment Configuration File
  *      *** Do not modify ! ***
  *
- * Project: '24_GPIO_IRQ' 
+ * Project: '24_gpio_irq' 
  * Target:  'tm4c1294' 
  */
 
