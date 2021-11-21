@@ -17,7 +17,8 @@ int main(void){
 	
 	//Switch at PJ0 port PJ1
 	SYSCTL->RCGCGPIO |= (1U<<8);
-	
+	while( (SYSCTL->PRGPIO &(1U<<8)) != (1U<<8)) {}; //Allow time to finish activating GPIO
+
 	GPIOJ_AHB->PUR |= (0x03); //enable pullup for SW1 and SW2 (PJ0, PJ1)
 	GPIOJ_AHB->DIR &= ~(0x03); //input
 	GPIOJ_AHB->DEN |= (0x03);
@@ -95,28 +96,23 @@ void GPIOJ_Handler(void){ //can fetch prototype
 }
 
 void delay(unsigned int time){
-	
-	time = (unsigned int)time*1.33929;
-	
+
 	unsigned int j=0;
 	SYSCTL->RCGCTIMER |= 0x01;
-	for(int i = 0; i<1; i++){}
+	while( (SYSCTL->PRTIMER &(1U<<0)) != (1U<<0)) {}; //Allow time to finish activating 
 	
 	TIMER0->CTL &= ~(1U<<0);
 	TIMER0->CFG = 0x04;
 
 	TIMER0->TAMR = 0x02;
-	TIMER0->TAILR = 25-1;
+	TIMER0->TAILR = 16-1;
 
 	TIMER0->ICR =0x01;
 	TIMER0->CTL |= (1U<<0);
 		
-	unsigned int temp = (TIMER0->RIS &0x1);
 		
 	for (j=0; j<time; j++){
-		while(temp==0x00){
-			temp = (TIMER0->RIS &0x1);
-		}
+		while((TIMER0->RIS &0x1)==0x00){	};
 		TIMER0->ICR = 0x01;
 	}
 	
