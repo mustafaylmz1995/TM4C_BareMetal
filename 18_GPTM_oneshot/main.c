@@ -51,7 +51,7 @@ void GPTM_Timer0_oneshot(unsigned int us){ // Send us type, for instance 1 sec i
 	//Regs		R7 R6 R5 R4 R3 R2 R1 R0
 
 	SYSCTL->RCGCTIMER |= 0x01; //Enable and provide a clock to 16/32-bit general-purpose timer module 0 in Run mode.
-	for(int i = 0; i<1; i++){}
+	while( (SYSCTL->PRTIMER &(1U<<0)) != (1U<<0)) {}; //Allow time to finish activating 
 	
 	//1. Ensure the timer is disabled (the TnEN bit in the GPTMCTL register is cleared) before making
 	//any changes.
@@ -80,7 +80,7 @@ void GPTM_Timer0_oneshot(unsigned int us){ // Send us type, for instance 1 sec i
 	//NOTUSED
 
 	//5. Load the start value into the GPTM Timer n Interval Load Register (GPTMTnILR).
-	TIMER0->TAILR = us*25 -1;
+	TIMER0->TAILR = us*16 -1;
 	
 	//6. If interrupts are required, set the appropriate bits in the GPTM Interrupt Mask Register
 	//(GPTMIMR).
