@@ -91,8 +91,7 @@ void GPIOJ_Handler(void){ //can fetch prototype
 	
 	
 	//toogle green LED4 3 times 
-	int i = 0;
-	for(i = 0; i<3; i++){
+	for(int i = 0; i<3; i++){
 		GPIOF_AHB->DATA |= LED4;
 		delay(250*mili);
 		GPIOF_AHB->DATA &= ~LED4;
@@ -109,17 +108,16 @@ void GPIOJ_Handler(void){ //can fetch prototype
 
 void delay(unsigned int time){
 	
-	time = (unsigned int)time*1.33929;
-	
 	unsigned int j=0;
 	SYSCTL->RCGCTIMER |= 0x01;
-	for(int i = 0; i<1; i++){}
+	while( (SYSCTL->PRTIMER &(1U<<0)) != (1U<<0)) {}; //Allow time to finish activating 
+
 	
 	TIMER0->CTL &= ~(1U<<0);
 	TIMER0->CFG = 0x04;
 
 	TIMER0->TAMR = 0x02;
-	TIMER0->TAILR = 25-1;
+	TIMER0->TAILR = 16-1;
 
 	TIMER0->ICR =0x01;
 	TIMER0->CTL |= (1U<<0);
@@ -127,9 +125,7 @@ void delay(unsigned int time){
 	unsigned int temp = (TIMER0->RIS &0x1);
 		
 	for (j=0; j<time; j++){
-		while(temp==0x00){
-			temp = (TIMER0->RIS &0x1);
-		}
+		while( (TIMER0->RIS &(1U<<0)) == 0x00){	}
 		TIMER0->ICR = 0x01;
 	}
 	
