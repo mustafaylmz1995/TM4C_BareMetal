@@ -18,10 +18,14 @@ int main(void){
 	__disable_irq();
 	
 	SYSCTL->RCGCGPIO |= (1U<<5);
+	while( (SYSCTL->PRGPIO &(1U<<5)) != (1U<<5)) {}; //Allow time to finish activating GPIO
+
 	GPIOF_AHB->DIR |= (LED4 | LED3); //output
 	GPIOF_AHB->DEN |= (LED4 | LED3);
 	
 	SYSCTL->RCGCGPIO |= (1U<<12);
+	while( (SYSCTL->PRGPIO &(1U<<12)) != (1U<<12)) {}; //Allow time to finish activating GPIO
+
 	GPION->DIR |= (LED1 | LED2); //output
 	GPION->DEN |= (LED1 | LED2);
 
@@ -45,7 +49,7 @@ int main(void){
 void timer0A_1Hz_init(void){
 	
 	SYSCTL->RCGCTIMER |= 0x01;	//enable clk to Timer Block 0
-	for(int i = 0; i<1; i++){}
+	while( (SYSCTL->PRTIMER &(1U<<0)) != (1U<<0)) {}; //Allow time to finish activating 
 		
 	TIMER0->CTL &= ~(1U<<0);	//disable Timer0 before initialization
 	TIMER0->CFG = 0x04;	//16-bit option
@@ -68,7 +72,7 @@ void timer0A_1Hz_init(void){
 void timer1A_10Hz_init(void){
 	
 	SYSCTL->RCGCTIMER |= 0x02;	//enable clk to Timer Block 1
-	for(int i = 0; i<1; i++){}
+	while( (SYSCTL->PRTIMER &(1U<<1)) != (1U<<1)) {}; //Allow time to finish activating 
 		
 	TIMER1->CTL &= ~(1U<<0);	//disable Timer1 before initialization
 	TIMER1->CFG = 0x04;	//16-bit option
@@ -127,27 +131,21 @@ void TIMER1A_Handler(){
 
 void delay(unsigned int time){
 	
-	time = (unsigned int)time*1.33929;
-	
 	unsigned int j=0;
 	SYSCTL->RCGCTIMER |= 0x04; //TIMER2A
-	for(int i = 0; i<1; i++){}
+	while( (SYSCTL->PRTIMER &(1U<<2)) != (1U<<2)) {}; //Allow time to finish activating 
 	
 	TIMER2->CTL &= ~(1U<<0);
 	TIMER2->CFG = 0x04;
 
 	TIMER2->TAMR = 0x02;
-	TIMER2->TAILR = 25-1;
+	TIMER2->TAILR = 16-1;
 
 	TIMER2->ICR =0x01;
 	TIMER2->CTL |= (1U<<0);
 		
-	unsigned int temp = (TIMER2->RIS &0x1);
-		
 	for (j=0; j<time; j++){
-		while(temp==0x00){
-			temp = (TIMER2->RIS &0x1);
-		}
+		while((TIMER2->RIS &0x1) == 0x00){	};
 		TIMER2->ICR = 0x01;
 	}
 	

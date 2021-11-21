@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Objects\27_ADC_basic.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\27_ADC_basic.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Fri Nov 19 11:41:30 2021
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Mon Nov 22 09:03:04 2021
 <BR><P>
 <H3>Maximum Stack Usage =          8 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -44,7 +44,6 @@ Mutually Recursive functions
  <LI><a href="#[1a]">ADC0SS0_Handler</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[1a]">ADC0SS0_Handler</a><BR>
  <LI><a href="#[1b]">ADC0SS1_Handler</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[1b]">ADC0SS1_Handler</a><BR>
  <LI><a href="#[1c]">ADC0SS2_Handler</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[1c]">ADC0SS2_Handler</a><BR>
- <LI><a href="#[1d]">ADC0SS3_Handler</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[1d]">ADC0SS3_Handler</a><BR>
  <LI><a href="#[1e]">WDT0_Handler</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[1e]">WDT0_Handler</a><BR>
  <LI><a href="#[1f]">TIMER0A_Handler</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[1f]">TIMER0A_Handler</a><BR>
  <LI><a href="#[20]">TIMER0B_Handler</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[20]">TIMER0B_Handler</a><BR>
@@ -156,7 +155,7 @@ Function Pointers
  <LI><a href="#[1a]">ADC0SS0_Handler</a> from startup_tm4c129.o(.text) referenced from startup_tm4c129.o(RESET)
  <LI><a href="#[1b]">ADC0SS1_Handler</a> from startup_tm4c129.o(.text) referenced from startup_tm4c129.o(RESET)
  <LI><a href="#[1c]">ADC0SS2_Handler</a> from startup_tm4c129.o(.text) referenced from startup_tm4c129.o(RESET)
- <LI><a href="#[1d]">ADC0SS3_Handler</a> from startup_tm4c129.o(.text) referenced from startup_tm4c129.o(RESET)
+ <LI><a href="#[1d]">ADC0SS3_Handler</a> from main.o(i.ADC0SS3_Handler) referenced from startup_tm4c129.o(RESET)
  <LI><a href="#[3a]">ADC1SS0_Handler</a> from startup_tm4c129.o(.text) referenced from startup_tm4c129.o(RESET)
  <LI><a href="#[3b]">ADC1SS1_Handler</a> from startup_tm4c129.o(.text) referenced from startup_tm4c129.o(RESET)
  <LI><a href="#[3c]">ADC1SS2_Handler</a> from startup_tm4c129.o(.text) referenced from startup_tm4c129.o(RESET)
@@ -597,13 +596,6 @@ Global Symbols
 <BR><BR>[Calls]<UL><LI><a href="#[1c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC0SS2_Handler
 </UL>
 <BR>[Called By]<UL><LI><a href="#[1c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC0SS2_Handler
-</UL>
-<BR>[Address Reference Count : 1]<UL><LI> startup_tm4c129.o(RESET)
-</UL>
-<P><STRONG><a name="[1d]"></a>ADC0SS3_Handler</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, startup_tm4c129.o(.text))
-<BR><BR>[Calls]<UL><LI><a href="#[1d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC0SS3_Handler
-</UL>
-<BR>[Called By]<UL><LI><a href="#[1d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC0SS3_Handler
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_tm4c129.o(RESET)
 </UL>
@@ -1363,10 +1355,13 @@ Global Symbols
 
 <P><STRONG><a name="[c7]"></a>__semihosting_library_function</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, indicate_semi.o(.text), UNUSED)
 
+<P><STRONG><a name="[1d]"></a>ADC0SS3_Handler</STRONG> (Thumb, 18 bytes, Stack size 0 bytes, main.o(i.ADC0SS3_Handler))
+<BR>[Address Reference Count : 1]<UL><LI> startup_tm4c129.o(RESET)
+</UL>
 <P><STRONG><a name="[79]"></a>SystemInit</STRONG> (Thumb, 20 bytes, Stack size 0 bytes, system_tm4c129.o(i.SystemInit))
 <BR>[Address Reference Count : 1]<UL><LI> startup_tm4c129.o(.text)
 </UL>
-<P><STRONG><a name="[95]"></a>main</STRONG> (Thumb, 170 bytes, Stack size 0 bytes, main.o(i.main))
+<P><STRONG><a name="[95]"></a>main</STRONG> (Thumb, 198 bytes, Stack size 0 bytes, main.o(i.main))
 <BR><BR>[Called By]<UL><LI><a href="#[94]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__rt_entry_main
 </UL>
 

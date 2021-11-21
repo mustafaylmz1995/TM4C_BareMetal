@@ -37,7 +37,7 @@
 //AIN19 	21 		PK3 I Analog Analog-to-digital converter input 19.
 
 
-
+//50k ohm PE1 kullanmis
 // PE3 -> POT2
 // 3v3 -> POT1
 // GND -> POT3
@@ -50,6 +50,8 @@ int main(){
 	SYSCTL->RCGCADC	 	|= (1U<<0);		//Enable clk for ADC module 0
 	
 	//PE3 init
+	//make pin input
+	GPIOE_AHB->DIR		&=~(1U<<3);		//Make pin input 
 	GPIOE_AHB->AFSEL  |= (1U<<3);		//Enable alternate function AIN0 at PE3
 	GPIOE_AHB->DEN		&=~(1U<<3);		//Disable Digital Function
 	GPIOE_AHB->AMSEL	|= (1U<<3);		//Enable Analog Function
@@ -92,28 +94,41 @@ int main(){
 																	//SS3 Trigger Select Third Nibble 
 																	//The trigger is initiated by setting the SSn 
 																	//bit in the ADCPSSI register
-	ADC0->SSMUX3			=		0;				//Get inout from channel 0 (Step 4)
+	
+//	ADC0->EMUX				|= (0xF000); //Continuous Sampling Delete PSSI trigger
+
+	ADC0->SSMUX3			=		0;				//Get inout from channel 0 (Step 4) PE3 which is analog input 0 AIN0
 																	//First Sample Input Select
-	ADC0->SSCTL3			|= (1U<<1)|		//(Step 5)
-											 (1U<<2);		//Take one sample at a time, set flat at 1st sample
+	ADC0->SSCTL3			|= ((1U<<1)|	//(Step 5)
+											 (1U<<2));	//Take one sample at a time, set flat at 1st sample
 																	// 3 	 2 	 1 		0
 																	//TS0 IE0 END0 D0  
+	
+	ADC0->IM					= (1U<<3);		//SS3 Interrupt masked
+	
 	ADC0->ACTSS 			|= (1U<<3);		//Enable Sample Sequencer 3 (SS3)	(Step 7)	
 	
-	
+	ADC0->ISC = (1U<<3); 		// cleared by writing a 1 to the IN3 bit in the ADCISC register.
+
+	NVIC->IP[17] = 0x03; // set the ADC0SS3 interrupt to priority 3
+	NVIC->ISER[0] = (1U<<17);	//Enable IRQ17 [0] => 0..31
 	
 	while(1){
 		
 		ADC0->PSSI |= (1U<<3);				//initiate sampling in the sample sequencers
 		
 		while( ((ADC0->RIS)&(1U<<3)) == 0 ) {}	//SS3 Raw Interrupt Status 
-																						//Wait for conversion complete
-		result = ADC0->SSFIFO3; // get the result 
-		ADC0->ISC = (1U<<3); 		// cleared by writing a 1 to the IN3 bit in the ADCISC register.
+		//Wait for conversion complete
+	
 	}
 	
 }
 
+void ADC0SS3_Handler(void){
 
+		result = ADC0->SSFIFO3; // get the result 
+		ADC0->ISC = (1U<<3); 		// cleared by writing a 1 to the IN3 bit in the ADCISC register.
 
+	
+}
 
