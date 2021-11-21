@@ -20,8 +20,11 @@ int main(void){
 void Timer4A_RisingEdgeEvent_init(void){
 	
 	SYSCTL->RCGCTIMER |= 0x10; //enable clk to Timer Block 4 0b 0001 0000
+	while( (SYSCTL->PRTIMER &(1U<<4)) != (1U<<4)) {}; //Allow time to finish activating Timer
+
 	SYSCTL->RCGCGPIO	|= 0x02; //Enable clk to PORTB
-	
+	while( (SYSCTL->PRGPIO &(1U<<1)) != (1U<<1)) {}; //Allow time to finish activating GPIO
+		
 	GPIOB_AHB->DIR	&= ~(1U<<0);	//make PB0 an input pin
 	GPIOB_AHB->DEN	|= (1U<<0);	//make PB0 a digital pin
 	GPIOB_AHB->AFSEL|= (1U<<0);	//enable alternate function on PB0
@@ -45,8 +48,8 @@ void Timer4A_RisingEdgeEvent_init(void){
 	
 	TIMER4->TAMATCHR = 0xFFFF;	//set the count limit, compared to TAR to determine match evetn
 	TIMER4->TAPMR = 0xFF; // used with TAMATCHR to expand to 0xFFFF FF with prescaler
-	
-	TIMER4->CTL |= (1U<<0);
+		
+	TIMER4->CTL  |= (1U<<0); // TAEN 0. bit and TBEN 8. bit	
 	
 }
 
