@@ -13,7 +13,7 @@ int main(void){
 	// Configure systick
 	
 	__disable_irq();
-	SysTick->LOAD = 25000000-1;
+	SysTick->LOAD = 16000000-1;
 	SysTick->CTRL = 7; //Enable Systick, Use interrupt, use sys clk
 	
 	__enable_irq();
