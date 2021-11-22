@@ -34,7 +34,7 @@ void ADC0_init(void){
 	ADC0->IM |= (1U<<3); //Controls whether the sample sequencer and digital comparator raw interrupt signals are sent to the interrupt controller.(SS3 Interrupt Mask)
 	ADC0->ACTSS |= ~(1U<<3);	//(Sample Sequencer 3 is enabled)
 
-	NVIC->IP[49] = (0x03);	// set interrupt to priority 3
+	NVIC->IP[49] = (0x03);	// set interrupt to priority 3 //incelenmeli!
 	NVIC->ISER[1] = (1U<<17);	//Enable IRQ49 32+17
 
 }
