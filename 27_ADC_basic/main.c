@@ -42,93 +42,114 @@
 // 3v3 -> POT1
 // GND -> POT3
 
-int result =0;
+
+void enable_clk(void);
+void sample_seq_conf(void);
+
+volatile unsigned result =0;
+unsigned int cleared = 0;
 
 int main(){
 	
-	SYSCTL->RCGCGPIO	|= (1U<<4);		//Enable clk for PORT E
+
+
+	enable_clk();
+	sample_seq_conf();
+
+	while(1){
+		
+	ADC0->PSSI |= (1U<<3);				//initiate sampling in the sample sequencers
+
+		
+		while( !(((ADC0->RIS)&(1U<<3)) == (1U<<3) ) ) {	
+			
+		};	//SS3 Raw Interrupt Status 
+		//Wait for conversion complete
+		
+		result = ADC0->SSFIFO3; // get the result 
+		ADC0->ISC = (1U<<3); 		// cleared by writing a 1 to the IN3 bit in the ADCISC register.
+		cleared = ADC0->ISC;
+
+	for(unsigned int i = 0; i<1000; i++){
+		for(unsigned int j = 0; j<3180; ){
+			j++;
+		}
+	}
+		
+	}
+	
+}
+
+void enable_clk(void){
+
 	SYSCTL->RCGCADC	 	|= (1U<<0);		//Enable clk for ADC module 0
-	
-	//PE3 init
-	//make pin input
-	GPIOE_AHB->DIR		&=~(1U<<3);		//Make pin input 
+	while((SYSCTL->PRADC & (1U<<0)) != (1U<<0)) {}; //whether the ADC modules are ready to be accessed by software
+
+	SYSCTL->RCGCGPIO	|= (1U<<4);		//Enable clk for PORT E
+	while( (SYSCTL->PRGPIO & (1U<<4)) != (1U<<4)){};	//whether the GPIO modules are ready to be accessed by software
+
 	GPIOE_AHB->AFSEL  |= (1U<<3);		//Enable alternate function AIN0 at PE3
-	GPIOE_AHB->DEN		&=~(1U<<3);		//Disable Digital Function
-	GPIOE_AHB->AMSEL	|= (1U<<3);		//Enable Analog Function
+	GPIOE_AHB->PCTL 	&= ~(1U<<3); 	//configure PE3
+	GPIOE_AHB->PCTL 	|= (0U<<3);		//0th Functionality (ADC)
 	
+	GPIOE_AHB->DEN		&=~(1U<<3);		//Disable Digital Function (makes it analog)
 	
-//Sample Sequencer Configuration
-//Configuration of the sample sequencers is slightly more complex than the module initialization
-//because each sample sequencer is completely programmable.
-//	
-//The configuration for each sample sequencer should be as follows:
-//	
-//1. Ensure that the sample sequencer is disabled by clearing the corresponding ASENn bit in the
-//ADCACTSS register. Programming of the sample sequencers is allowed without having them
-//enabled. Disabling the sequencer during programming prevents erroneous execution if a trigger
-//event were to occur during the configuration process.
-//	
-//2. Configure the trigger event for the sample sequencer in the ADCEMUX register.
-//
-//3. When using a PWM generator as the trigger source, use the ADC Trigger Source Select
-//(ADCTSSEL) register to specify in which PWM module the generator is located. The default
-//register reset selects PWM module 0 for all generators.
-//
-//4. For each sample in the sample sequence, configure the corresponding input source in the
-//ADCSSMUXn and ADCSSEMUXn registers.
-//
-//5. For each sample in the sample sequence, configure the sample control bits in the corresponding
-//nibble in the ADCSSCTLn register. When programming the last nibble, ensure that the END bit
-//is set. Failure to set the END bit causes unpredictable behavior.
-//
-//6. If interrupts are to be used, set the corresponding MASK bit in the ADCIM register.
-//
-//7. Enable the sample sequencer logic by setting the corresponding ASENn bit in the ADCACTSS
-//register.
+	GPIOE_AHB->AMSEL	|= (0xFU<<3);		//Disable Analog Function		
+		
+}
+
+
+/*
+	Sample Sequencer Configuration
+	Configuration of the sample sequencers is slightly more complex than the module initialization
+	because each sample sequencer is completely programmable.
+		
+	The configuration for each sample sequencer should be as follows:
+		
+	1. Ensure that the sample sequencer is disabled by clearing the corresponding ASENn bit in the
+	ADCACTSS register. Programming of the sample sequencers is allowed without having them
+	enabled. Disabling the sequencer during programming prevents erroneous execution if a trigger
+	event were to occur during the configuration process.
+		
+	2. Configure the trigger event for the sample sequencer in the ADCEMUX register.
+
+	3. When using a PWM generator as the trigger source, use the ADC Trigger Source Select
+	(ADCTSSEL) register to specify in which PWM module the generator is located. The default
+	register reset selects PWM module 0 for all generators.
+
+	4. For each sample in the sample sequence, configure the corresponding input source in the
+	ADCSSMUXn and ADCSSEMUXn registers.
+
+	5. For each sample in the sample sequence, configure the sample control bits in the corresponding
+	nibble in the ADCSSCTLn register. When programming the last nibble, ensure that the END bit
+	is set. Failure to set the END bit causes unpredictable behavior.
+
+	6. If interrupts are to be used, set the corresponding MASK bit in the ADCIM register.
+
+	7. Enable the sample sequencer logic by setting the corresponding ASENn bit in the ADCACTSS
+	register
+*/
+void sample_seq_conf(void){
 	
-	
-	//ADC Init
 	ADC0->ACTSS 			&=~(1U<<3);		//Disable Sample Sequencer 3 (SS3)	(Step 1)		
-	ADC0->EMUX				&=~(0xF000);	//Selects the event (trigger) that initiates (Step 2)
+	
+	ADC0->EMUX				= (0x0EEE);		//Selects the event (trigger) that initiates (Step 2)
 																	//sampling for each sample sequencer
 																	//SS3 Trigger Select Third Nibble 
 																	//The trigger is initiated by setting the SSn 
 																	//bit in the ADCPSSI register
 	
-//	ADC0->EMUX				|= (0xF000); //Continuous Sampling Delete PSSI trigger
-
 	ADC0->SSMUX3			=		0;				//Get inout from channel 0 (Step 4) PE3 which is analog input 0 AIN0
 																	//First Sample Input Select
-	ADC0->SSCTL3			|= ((1U<<1)|	//(Step 5)
-											 (1U<<2));	//Take one sample at a time, set flat at 1st sample
-																	// 3 	 2 	 1 		0
-																	//TS0 IE0 END0 D0  
+	ADC0->SSEMUX3			=		0;				//Extra 4 bit wide for SSMUX3
+	
+	ADC0->SSCTL3			|= ((1U<<1)| (1U<<2));	//Take one sample at a time, set flat at 1st sample (Step5)
+																			// 3 	 2 	 1 		0
+																			//TS0 IE0 END0 D0  	
 	
 	ADC0->IM					= (1U<<3);		//SS3 Interrupt masked
 	
 	ADC0->ACTSS 			|= (1U<<3);		//Enable Sample Sequencer 3 (SS3)	(Step 7)	
-	
-	ADC0->ISC = (1U<<3); 		// cleared by writing a 1 to the IN3 bit in the ADCISC register.
 
-	NVIC->IP[17] = 0x03; // set the ADC0SS3 interrupt to priority 3
-	NVIC->ISER[0] = (1U<<17);	//Enable IRQ17 [0] => 0..31
-	
-	while(1){
-		
-		ADC0->PSSI |= (1U<<3);				//initiate sampling in the sample sequencers
-		
-		while( ((ADC0->RIS)&(1U<<3)) == 0 ) {}	//SS3 Raw Interrupt Status 
-		//Wait for conversion complete
-	
-	}
-	
 }
-
-void ADC0SS3_Handler(void){
-
-		result = ADC0->SSFIFO3; // get the result 
-		ADC0->ISC = (1U<<3); 		// cleared by writing a 1 to the IN3 bit in the ADCISC register.
-
 	
-}
-

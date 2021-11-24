@@ -3,7 +3,7 @@
  * Auto generated Run-Time-Environment Configuration File
  *      *** Do not modify ! ***
  *
- * Project: '27_adc_basic' 
+ * Project: '27_ADC_basic' 
  * Target:  'tm4c1294' 
  */
 

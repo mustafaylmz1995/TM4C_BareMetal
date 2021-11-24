@@ -3,7 +3,7 @@
  * Auto generated Run-Time-Environment Configuration File
  *      *** Do not modify ! ***
  *
- * Project: '28_adc_timertrigger' 
+ * Project: '28_ADC_TimerTrigger' 
  * Target:  'tm4c1294' 
  */
 
