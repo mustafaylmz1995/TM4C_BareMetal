@@ -12,8 +12,10 @@ int main(){
 	while(1){
 		
 		for(i = 'A'; i<='z'; i++){
+			GPIOD_AHB->DATA &=~(1U<<2);
 			SSI2Write(i);
-			
+			GPIOD_AHB->DATA |= (1U<<2);
+			delay(500*1e3);
 		}
 	
 	}
@@ -45,29 +47,33 @@ void delay(unsigned int time){
 }
 
 void SSI_init(void){
-	
+	//Page 1241
+	//Step 1
 	SYSCTL->RCGCSSI |= (1U<<2); //SSI2 will be used
 	while( (SYSCTL->PRSSI & (1U<<2)) != (1U<<2) ) {}; //whether the SSI modules are ready to be accessed by software
+	//Step 2
 	SYSCTL->RCGCGPIO |= (1U<<3); //PORTD opened for SSI signals
 	while( (SYSCTL->PRGPIO &(1U<<3)) != (1U<<3) ) {}; //Allow time to finish activating GPIOD
-	SYSCTL->RCGCGPIO |= (1U<<5); //PORTF opened for LED
-	while( (SYSCTL->PRGPIO &(1U<<5)) != (1U<<5) ) {}; //Allow time to finish activating GPIOF
+	//Step 3
+	GPIOD_AHB->AFSEL |= ((1U<<1) | (1U<<2) | (1U<<3)); //Alternate Function
+	//Step 4
+	GPIOD_AHB->PCTL &= ~((1U<<1) | (1U<<2) | (1U<<3)); //configure PD3, PD2 and PD1
+	GPIOD_AHB->PCTL |= ((0xF<<1) | (0xF<<2) | (0xF<<3));	//15th Functionality is SSI2 
+	//Step 5
+	GPIOD_AHB->ODR &= ~((1U<<1) | (1U<<2) | (1U<<3));
+	GPIOD_AHB->DEN |= ((1U<<1) | (1U<<2) | (1U<<3)); // PD3 SS2CLK, PD2 SSI2Fss and PD1 SSI2XDAT0(SSI2Tx) Digitally enable
+
+	GPIOD_AHB->DIR |= (1U<<2); // PD2 SSI2Fss OUTPUT
+	GPIOD_AHB->DATA |= (1U<<2);
+
+
 	
-	GPIOD_AHB->AMSEL &= ~((1U<<1) | (1U<<3)); //Disable analog for PD3 SS2CLK and PD0 SSI2XDAT0(SSI2Tx)
-	GPIOD_AHB->DEN |= ((1U<<1) | (1U<<3)); // PD3 SS2CLK and PD0 SSI2XDAT0(SSI2Tx) Digitally enable
-	
-	GPIOD_AHB->AFSEL |= ((1U<<1) | (1U<<3)); //Alternate Function
-	GPIOD_AHB->PCTL &= ~((1U<<1) | (1U<<3)); //configure PD3 and PD0
-	GPIOD_AHB->PCTL |= ((0xF<<0) | (0xF<<3));	//15th Functionality is SSI2 
-		
-	GPIOF_AHB->DEN |= (1U<<0); //PF0 LED4 opened for digital enable
-	GPIOF_AHB->DIR |= (1U<<0); //PF0 LED4 sets as Digital Output
-	GPIOF_AHB->DATA|= (1U<<0); //PF0 LED4 sets as HIGH
-		
+	//QSSI configuration		
 	/*
-	*		SPI Master, CPOL = 0, CPHA = 0, Clk = 4 MHz, 16 bit data
+	*		SPI Master, CPOL = 0, CPHA = 0, Clk = 2 MHz, 8 bit data
 	*/
 	//-----------------------------------------------------------	
+	//Step 1/2
 	/*ensure that the SSE bit in the SSICR1 register is clear before making any configuration changes*/
 	/*
 		Bit		Description
@@ -97,9 +103,9 @@ void SSI_init(void){
 		
 		
 		*/		
-	SSI2->CR1 = 0x00; // disable SS2
+	SSI2->CR1 &= ~0xFF; // disable SS2
 	
-	
+	//Step 3
 	/* clock source */
 	/*
 		Bit		Description
@@ -107,9 +113,9 @@ void SSI_init(void){
 					programmed in RSCLKCFG register in the System Control Module)
 					Specifies the source that generates for the QSSI baud clock
 	*/
-	SSI2->CC =0x00;
+	SSI2->CC &= ~0xFF;
 	
-	
+	//Step 4
 	/*Configure the clock prescale divisor*/
 	/*
 		Bit   Description
@@ -118,9 +124,9 @@ void SSI_init(void){
 					frequency of SSInClk. The LSB always returns 0 on reads	
 	*/
 	/* SSInClk = SysClk / (CPSDVSR * (1 + SCR)) */
-	SSI2->CPSR = 0x02; //prescaler divided by 2 8MHz
+	SSI2->CPSR |= 0x08; //prescaler divided by 8 2MHz
 	
-	
+	//Step 5
 	/* Configure serial Clk Rate, Clk Phase and Polarity, Protocol Mode and Data Size */
 	/*
 		Bit   Description
@@ -134,16 +140,18 @@ void SSI_init(void){
 		3:0   SSI Data Size : 0x7 8-bit data
 
 	*/
-	SSI2->CR0 = 0x7; //8 MHz SSI clk, SPImode, 8 bit data
+	SSI2->CR0 |= 0x7; //2 MHz SSI clk, SPImode, 8 bit data
+
 	
-	SSI2->CR1 |= (1U<<0); //Enable SSI2
+	//Step 7
+	SSI2->CR1 |= (1U<<0) ; //Enable SSI2
 		
 		
 }
 
 
 void SSI2Write(unsigned char data){
-	GPIOF_AHB->DATA &= ~(1U<<0);
+
 	/*Status Register*/
 	/*
 		Bit   Description
@@ -168,7 +176,7 @@ void SSI2Write(unsigned char data){
 					1 The transmit FIFO is empty.
 	
 	*/
-	while( (SSI2->SR & (1U<<1)) == 0) {}; //wait for not full
+//	while( (SSI2->SR & (1U<<1)) == 0) {}; //wait for not full
 		
 	/*
 		SSI Receive/Transmit Data
@@ -179,14 +187,10 @@ void SSI2Write(unsigned char data){
 				
 		*/
 		
-	SSI2->DR = data; //16 bits wide
+	SSI2->DR |= (0x00FF & data); //8 bits wide
 	
-	while( (SSI2->SR & (1U<<4)) == 0) {};//wait for transmission completed
-	
-	GPIOF_AHB->DATA |= (1U<<0);
-	
-	delay(1e6);
-		
+	while( (SSI2->SR & (1U<<4)) == (1U<<4) ) {};//wait for empty
+			
 }
 
 
