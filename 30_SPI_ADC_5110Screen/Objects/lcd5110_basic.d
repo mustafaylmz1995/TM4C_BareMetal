@@ -1,0 +1,13 @@
+.\objects\lcd5110_basic.o: LCD5110_Basic.c
+.\objects\lcd5110_basic.o: LCD5110_Basic.h
+.\objects\lcd5110_basic.o: C:\Users\MYILMAZ\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C129\TM4C129.h
+.\objects\lcd5110_basic.o: C:\Users\MYILMAZ\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C129\TM4C1294NCPDT.h
+.\objects\lcd5110_basic.o: C:\Users\MYILMAZ\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include\core_cm4.h
+.\objects\lcd5110_basic.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\lcd5110_basic.o: C:\Users\MYILMAZ\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include\cmsis_version.h
+.\objects\lcd5110_basic.o: C:\Users\MYILMAZ\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include\cmsis_compiler.h
+.\objects\lcd5110_basic.o: C:\Users\MYILMAZ\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include\cmsis_armcc.h
+.\objects\lcd5110_basic.o: C:\Users\MYILMAZ\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C129\system_TM4C129.h
+.\objects\lcd5110_basic.o: delay.h
+.\objects\lcd5110_basic.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+.\objects\lcd5110_basic.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
