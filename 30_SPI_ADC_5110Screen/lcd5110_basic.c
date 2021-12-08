@@ -16,14 +16,9 @@
 //PE1 --------------------------------> DC ( Command(0)/Data(1) )
 
 
-
-
 __current_font cfont;
 boolean __sleep;
 unsigned int __contrast;
-
-
-
 
 
 void GPIO_init(void){
@@ -183,7 +178,7 @@ void MCU_start(void){
 
 void resetLCD(void){
 	GPIOE_AHB->DATA &= ~(1U<<0); //reset active low
-	delay(100*MS);
+	delay(150*MS);
 	GPIOE_AHB->DATA |= (1U<<0);
 }
 
@@ -215,12 +210,12 @@ void LCD5510_initLCD(int contrast){
 	resetLCD(); //1. Reset Res pin active low there should be 100ms wait time
 	
 	__LCD_WRITE(PCD8544_FUNCTIONSET | PCD8544_EXTENDEDINSTRUCTION, LCD_COMMAND);//Fonksiyonel Ayarlamalar için extended instruction acildi
-	__LCD_WRITE(PCD8544_SETBIASSYS|LCD_BIAS, LCD_COMMAND); //Set 1:48 bias recommended mux rate 
 	__LCD_WRITE(PCD8544_SETVOP|contrast, LCD_COMMAND); //Operational Voltage level set for 1:48 Bias setting  Vlcd = 6.06*Vthreshold Vop 00->7F arasinda contrast ayari icin kullanilir
 	__LCD_WRITE(PCD8544_SETTEMPCOEF | LCD_TEMP, LCD_COMMAND); //Temperature Coefficient Set 0x02
+	__LCD_WRITE(PCD8544_SETBIASSYS|LCD_BIAS, LCD_COMMAND); //Set 1:48 bias recommended mux rate 
+
 
 	__LCD_WRITE(PCD8544_FUNCTIONSET, LCD_COMMAND); //Func seti temizledik
-	__LCD_WRITE(PCD8544_DISPLAYCONTROL|PCD8544_DISPLAYNORMAL, LCD_COMMAND); //Displayi Normal moda çevirdik
 	__LCD_WRITE(PCD8544_SETYADDR, LCD_COMMAND); //0-5 arasi bankler icin Ram adresi ayarlanir
 	__LCD_WRITE(PCD8544_SETXADDR, LCD_COMMAND); // 0-83 arasi satir için Ram adresini ayarlar
 	
@@ -230,6 +225,8 @@ void LCD5510_initLCD(int contrast){
 		__LCD_WRITE(0x00, LCD_DATA);	//Tüm bank ve Satirlar için Ramdeki degerler 0 degeri ile dolduruldu
 	}		
 	
+	__LCD_WRITE(PCD8544_DISPLAYCONTROL|PCD8544_DISPLAYNORMAL, LCD_COMMAND); //Displayi Normal moda çevirdik
+
 	
 	
 	cfont.font = 0; //font degerini 0 atiyoruz
@@ -280,8 +277,7 @@ void __print_char(unsigned char c, int x, int row){
 
 void LCD5110_print(char *st, int x, int y){
 	
-	unsigned char ch;
-	int st1, row, xp;
+	int st1, row;
 	
 	if(!__sleep){
 		
@@ -297,7 +293,7 @@ void LCD5110_print(char *st, int x, int y){
 			x = 0;
 		
 		row = y>>3;
-		xp = x;
+
 		
 		for(int cnt=0; cnt<st1; cnt++)
 			__print_char(*st++, x+(cnt*(cfont.x_size)), row);
@@ -418,7 +414,7 @@ void LCD5110_printNumF(double num, unsigned char dec, int x, int y, char divider
 			
 		}
 		
-		printf(st, x, y);
+		LCD5110_print(st, x, y);
 		
 	}
 	
@@ -543,7 +539,8 @@ void LCD5110_disableSleep(void){
 }
 
 
-unsigned char SmallFont[]  =
+
+const unsigned char SmallFont[]  =
 {
 0x06, 0x08, 0x20, 0x5f,
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   // sp
@@ -649,7 +646,7 @@ unsigned char SmallFont[]  =
 };
 
 
-unsigned char MediumNumbers[]  =
+const unsigned char MediumNumbers[]  =
 {
 0x0c, 0x10, 0x2d, 0x0d,
 0x00, 0x00, 0x00, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x01, 0x00, 0x00,   // -
@@ -667,7 +664,7 @@ unsigned char MediumNumbers[]  =
 0x00, 0xfc, 0x7a, 0x86, 0x86, 0x86, 0x86, 0x86, 0x86, 0x7a, 0xfc, 0x00, 0x00, 0x00, 0x81, 0xc3, 0xc3, 0xc3, 0xc3, 0xc3, 0xc3, 0xbd, 0x7e, 0x00,   // 9
 };
 
-unsigned char BigNumbers[]  =
+const unsigned char BigNumbers[]  =
 {
 0x0e, 0x18, 0x2d, 0x0d,
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x38, 0x38, 0x38, 0x38, 0x38, 0x38, 0x38, 0x38, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   // -
@@ -684,3 +681,4 @@ unsigned char BigNumbers[]  =
 0x00, 0xfc, 0xfa, 0xf6, 0x0e, 0x0e, 0x0e, 0x0e, 0x0e, 0x0e, 0xf6, 0xfa, 0xfc, 0x00, 0x00, 0xef, 0xd7, 0xbb, 0x38, 0x38, 0x38, 0x38, 0x38, 0x38, 0xbb, 0xd7, 0xef, 0x00, 0x00, 0x7f, 0xbf, 0xdf, 0xe0, 0xe0, 0xe0, 0xe0, 0xe0, 0xe0, 0xdf, 0xbf, 0x7f, 0x00,   // 8
 0x00, 0xfc, 0xfa, 0xf6, 0x0e, 0x0e, 0x0e, 0x0e, 0x0e, 0x0e, 0xf6, 0xfa, 0xfc, 0x00, 0x00, 0x0f, 0x17, 0x3b, 0x38, 0x38, 0x38, 0x38, 0x38, 0x38, 0xbb, 0xd7, 0xef, 0x00, 0x00, 0x00, 0x80, 0xc0, 0xe0, 0xe0, 0xe0, 0xe0, 0xe0, 0xe0, 0xdf, 0xbf, 0x7f, 0x00,   // 9
 };
+

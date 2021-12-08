@@ -54,16 +54,22 @@ void SSI_init(void){
 	//Step 2
 	SYSCTL->RCGCGPIO |= (1U<<3); //PORTD opened for SSI signals
 	while( (SYSCTL->PRGPIO &(1U<<3)) != (1U<<3) ) {}; //Allow time to finish activating GPIOD
+	
+	
+	GPIOD_AHB->DIR |= (1U<<2); // PD2 SSI2Fss OUTPUT	
+		
 	//Step 3
 	GPIOD_AHB->AFSEL |= ((1U<<1) | (1U<<2) | (1U<<3)); //Alternate Function
 	//Step 4
 	GPIOD_AHB->PCTL &= ~((1U<<1) | (1U<<2) | (1U<<3)); //configure PD3, PD2 and PD1
-	GPIOD_AHB->PCTL |= ((0xF<<1) | (0xF<<2) | (0xF<<3));	//15th Functionality is SSI2 
+	GPIOD_AHB->PCTL |= ((0xF<<4) | (0xF<<8) | (0xF<<12));	//15th Functionality is SSI2 4 bit for ecery pin
 	//Step 5
 	GPIOD_AHB->ODR &= ~((1U<<1) | (1U<<2) | (1U<<3));
+		
+	GPIOD_AHB->AMSEL &= ~( (1U<<1) | (1U<<2) | (1U<<3) ); //Disable analog for PD3, PD2 and PD1
 	GPIOD_AHB->DEN |= ((1U<<1) | (1U<<2) | (1U<<3)); // PD3 SS2CLK, PD2 SSI2Fss and PD1 SSI2XDAT0(SSI2Tx) Digitally enable
 
-	GPIOD_AHB->DIR |= (1U<<2); // PD2 SSI2Fss OUTPUT
+
 	GPIOD_AHB->DATA |= (1U<<2);
 
 
@@ -144,7 +150,7 @@ void SSI_init(void){
 
 	
 	//Step 7
-	SSI2->CR1 |= (1U<<0) ; //Enable SSI2
+	SSI2->CR1 |= (1U<<1) ; //Enable SSI2
 		
 		
 }
@@ -176,7 +182,7 @@ void SSI2Write(unsigned char data){
 					1 The transmit FIFO is empty.
 	
 	*/
-//	while( (SSI2->SR & (1U<<1)) == 0) {}; //wait for not full
+	while( (SSI2->SR & (1U<<1)) == 0) {}; //wait for not full
 		
 	/*
 		SSI Receive/Transmit Data
@@ -189,7 +195,7 @@ void SSI2Write(unsigned char data){
 		
 	SSI2->DR |= (0x00FF & data); //8 bits wide
 	
-	while( (SSI2->SR & (1U<<4)) == (1U<<4) ) {};//wait for empty
+	while( (SSI2->SR & (1U<<4)) ) {};//wait for empty
 			
 }
 

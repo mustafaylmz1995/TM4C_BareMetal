@@ -8,4 +8,6 @@
 .\objects\main.o: C:\Users\MYILMAZ\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include\cmsis_armcc.h
 .\objects\main.o: C:\Users\MYILMAZ\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C129\system_TM4C129.h
 .\objects\main.o: LCD5110_Basic.h
+.\objects\main.o: adc.h
 .\objects\main.o: delay.h
+.\objects\main.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
