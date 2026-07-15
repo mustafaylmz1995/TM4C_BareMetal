@@ -63,6 +63,70 @@ TM4C_BareMetal/
 
 ---
 
+## 📚 Detailed Lesson Contents
+
+### 🟢 Phase 1: Getting Started (Lessons 00–03)
+| Lesson | Topic | Concepts |
+|:-------|:------|:---------|
+| **00** | cnt_debug | µVision debug setup, watch window, step-through debugging |
+| **01** | cnt_debug 2 | Advanced debug: breakpoints, call stack, memory viewer |
+| **02** | LED_on | **First bare-metal program**: GPIO clock gating, direction, data registers |
+| **03** | Switch_Control | GPIO input mode, pull-up/down, button debounce |
+
+### 🔵 Phase 2: Assembly & C Interop (Lessons 04–07)
+| Lesson | Topic | Concepts |
+|:-------|:------|:---------|
+| **04** | export_from_Assembly | Calling assembly functions from C, preserving registers |
+| **05** | export_from_C | Calling C functions from assembly |
+| **06** | var_in_Assembly | Variable storage in assembly: .data, .bss, .rodata sections |
+| **07** | Embedded_Essential | Volatile, memory-mapped I/O, bit-band operations |
+
+### 🟡 Phase 3: CMSIS & Peripheral Drivers (Lessons 08–11)
+| Lesson | Topic | Concepts |
+|:-------|:------|:---------|
+| **08** | Keil_CMSIS | ARM CMSIS-Core: NVIC, SystemControl, core register access |
+| **09** | Keil_CMSIS_IO | CMSIS I/O: GPIO via CMSIS driver layer |
+| **10** | Keil_CMSIS_IO_hw | CMSIS I/O with hardware configuration |
+| **11** | GPIO_Driver | **Custom GPIO driver**: modular read/write/toggle with struct mapping |
+
+### 🟠 Phase 4: Display Interfaces (Lessons 12–16)
+| Lesson | Topic | Concepts |
+|:-------|:------|:---------|
+| **12** | LCD_Basic | HD44780 character LCD in 8-bit mode |
+| **13** | seven_segment | 7-segment display: segment mapping, multiplexing |
+| **14** | four_sevSegment | 4-digit multiplexed 7-segment display |
+| **15** | LCD_fourbit | HD44780 in 4-bit mode (saves GPIO pins) |
+| **16** | KeyPadwLCD | 4x4 matrix keypad scanning + LCD output |
+
+### 🔴 Phase 5: Timers & System Tick (Lessons 17–22)
+| Lesson | Topic | Concepts |
+|:-------|:------|:---------|
+| **17** | SysTick_Timer | SysTick configuration, reload value calculation |
+| **18** | GPTM_oneshot | General-purpose timer in one-shot mode |
+| **19** | GPTM_periodic | GPTM periodic mode for fixed-interval interrupts |
+| **20** | GPTM_cnt_RisEdges | Input edge counting for frequency measurement |
+| **21** | GPTM_measure_b_Events | Event timing: pulse width, period measurement |
+| **22** | GPTM_wideTimers | 64-bit wide timer mode for long-duration measurements |
+
+### 🟣 Phase 6: Interrupts (Lessons 23–26)
+| Lesson | Topic | Concepts |
+|:-------|:------|:---------|
+| **23** | SysTick_ISR | SysTick interrupt handler, interrupt nesting |
+| **24** | GPIO_IRQ | GPIO external interrupt on rising/falling edge |
+| **25** | GPIO_multi_IRQ | Multiple GPIO interrupts with shared handler |
+| **26** | Time_IRQ | Timer interrupt with compare match |
+
+### 🟤 Phase 7: Advanced Peripherals (Lessons 27–31)
+| Lesson | Topic | Concepts |
+|:-------|:------|:---------|
+| **27** | ADC_basic | Analog-to-digital conversion, sequence, FIFO |
+| **28** | ADC_TimerTrigger | Timer-triggered ADC for precise sampling |
+| **29** | SPI_basic | SPI master/slave communication, clock polarity/phase |
+| **30** | SPI_ADC_5110Screen | SPI + ADC + Nokia 5110 graphical LCD (PCD8544) |
+| **31** | UART_driver_assembly | UART transmit/receive driver written in ARM assembly |
+
+---
+
 ## 🚀 Topics Covered
 
 | Category | Topics | # Lessons |
@@ -85,7 +149,7 @@ TM4C_BareMetal/
 |:----------|:-------|
 | **MCU** | TM4C1294NCPDT (ARM Cortex-M4F @ 120 MHz) |
 | **Board** | Texas Instruments EK-TM4C1294XL |
-| **IDE** | Keil MDK-ARM (uVision) |
+| **IDE** | Keil MDK-ARM (µVision) |
 | **Debugger** | On-board ICDI |
 | **Language** | C, ARM Assembly (Thumb-2) |
 
@@ -106,7 +170,7 @@ TM4C_BareMetal/
 git clone https://github.com/mustafaylmz1995/TM4C_BareMetal.git
 cd TM4C_BareMetal
 
-# Open any lesson in Keil uVision
+# Open any lesson in Keil µVision
 # e.g., 02_LED_on/LED_on.uvprojx
 ```
 
@@ -114,7 +178,7 @@ cd TM4C_BareMetal
 
 ## 📄 License
 
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file.
+MIT License.
 
 ---
 
